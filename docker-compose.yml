@@ -1,0 +1,36 @@
+version: "3.9"
+services:
+  app:
+    build: 
+      context: ui
+      dockerfile: dockerfile.txt
+    container_name: ui-container
+    volumes:
+      - ./ui:/ui-app
+      - /src/results:/src/results
+      - /src/logo:/src/logo
+    environment:
+      - DETMODE=4
+    ports:
+      - "5001:5001"
+    restart: always
+  ai_prediction:
+    build: 
+      context: ai
+      dockerfile: dockerfile.txt
+    container_name: ai-container
+    volumes:
+      - ./ai:/ai-app
+      - /src/model:/src/model
+      - /src/_base_:/src/_base_ 
+    ports:
+      - "5000:5000"
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
